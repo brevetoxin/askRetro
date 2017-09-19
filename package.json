@@ -1,0 +1,19 @@
+{
+  "name": "askRetro",
+  "version": "0.0.1",
+  "dependencies": {},
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^2.3.3",
+    "istanbul": "^0.3.22"
+  },
+  "scripts": {
+    "start": "node index",
+    "test": "istanbul cover _mocha"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com/brevetoxin/askRetro"
+  },
+  "author": "Brian Darrow <brianpdarrow@gmail.com>"
+}
