@@ -5,7 +5,7 @@ const config = require('../config/default.json');
 
 const startYear = process.env['ASKRETRO_START_YEAR'] || config.startYear;
 const endYear = process.env['ASKRETRO_END_YEAR'] || config.endYear;
-const league = process.env['ASKRETRO_LEAGUE'] || config.league;
+const defaultLeague = process.env['ASKRETRO_LEAGUE'] || config.league;
 const team = process.env['ASKRETRO_TEAM'] || config.team;
 const resourceFolder = process.env['ASKRETRO_RESOURCE_FOLDER'] || config.resourcePath;
 let targetFiles = [];
@@ -17,7 +17,8 @@ const fileFilter = (filePath => {
   return true;
 });
 
-const filterByLeague = (filePath => {
+const filterByLeague = ((filePath, leagueCode) => {
+  const league = leagueCode || defaultLeague;
   if (league) {
     const fileParts = filePath.split('.');
     const extension = fileParts.pop();
@@ -66,5 +67,5 @@ const retrieveFiles = () => {
 
 module.exports = {
   retrieveFiles,
-  targetFiles
+  filterByLeague
 };
