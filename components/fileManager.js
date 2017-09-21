@@ -1,13 +1,8 @@
 'use strict'
 
-var recursive = require("recursive-readdir");
-const config = require('../config/default.json');
+const readDir = require("recursive-readdir");
+const config = require('./configuration');
 
-const startYear = process.env['ASKRETRO_START_YEAR'] || config.startYear;
-const endYear = process.env['ASKRETRO_END_YEAR'] || config.endYear;
-const defaultLeague = process.env['ASKRETRO_LEAGUE'] || config.league;
-const team = process.env['ASKRETRO_TEAM'] || config.team;
-const resourceFolder = process.env['ASKRETRO_RESOURCE_FOLDER'] || config.resourcePath;
 let targetFiles = [];
 
 const fileFilter = (filePath => {
@@ -17,8 +12,8 @@ const fileFilter = (filePath => {
   return true;
 });
 
-const filterByLeague = ((filePath, leagueCode) => {
-  const league = leagueCode || defaultLeague;
+const filterByLeague = ((filePath) => {
+  const league = config.get('league');
   if (league) {
     const fileParts = filePath.split('.');
     const extension = fileParts.pop();
@@ -30,6 +25,7 @@ const filterByLeague = ((filePath, leagueCode) => {
 });
 
 const filterByTeam = (filePath => {
+  const team = config.get('team');
   if (team) {
     const pathParts = filePath.split('/');
     const fileParts = pathParts.pop().split('.');
@@ -40,6 +36,8 @@ const filterByTeam = (filePath => {
 });
 
 const filterByYear = (filePath => {
+  const startYear = config.get('startYear');
+  const endYear = config.get('endYear');
   if (startYear || endYear) {
     const start = startYear < 1 ? new Date().getFullYear() + startYear : startYear;
     const end = endYear < 1 ? new Date().getFullYear() + endYear : endYear;
@@ -55,17 +53,14 @@ const filterByYear = (filePath => {
 });
 
 const retrieveFiles = () => {
-  return new Promise ((resolve, reject) => {
-    recursive(resourceFolder, function(err, items) {
-        if (err) reject(err);
-        targetFiles = items.filter(item => fileFilter(item));
-        resolve(targetFiles);
-    });
-  })
-
-}
+  return readDir(config.get('resourcePath'))
+    .then(files => files.filter(file => fileFilter(file)));
+};
 
 module.exports = {
   retrieveFiles,
-  filterByLeague
+  filterByLeague,
+  filterByTeam,
+  filterByYear,
+  fileFilter
 };
