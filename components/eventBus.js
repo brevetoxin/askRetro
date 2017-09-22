@@ -8,15 +8,21 @@ const subscribe = (event, callback) => {
 };
 
 const trigger = (event, state, data) => {
-  events[event].forEach(callback => {
-    return callback(state, data);
-  });
+  if (events[event]) {
+    events[event].forEach(callback => {
+      callback(state, data);
+    });
+  }
+  return;
 };
 
 const triggerAsync = (event, state, data) => {
-  const eventPromises = events[event].map(callback => {
-    return Promise.resolve(callback(state, data));
-  });
+  let eventPromises = [];
+  if (events[event]) {
+    eventPromises = events[event].map(callback => {
+      return Promise.resolve(callback(state, data));
+    });
+  }
   return Promise.all(eventPromises);
 };
 

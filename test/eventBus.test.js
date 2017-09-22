@@ -59,5 +59,13 @@ describe('EventBus', () => {
           expect(result[0]).to.equal('myAnswer');
         });
     });
+    it('Handles cases where the event does not exist', () => {
+      const callback = (state, data) => state;
+      eventBus.events.test = undefined;
+      eventBus.triggerAsync('test', 'myAnswer')
+        .then(result => {
+          expect(result.length).to.equal(0);
+        });
+    });
   })
 });
