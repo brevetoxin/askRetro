@@ -1,6 +1,7 @@
 'use strict'
 
-const readDir = require("recursive-readdir");
+const readDir = require('recursive-readdir');
+const fs = require('fs');
 const config = require('./configuration');
 
 let targetFiles = [];
@@ -57,10 +58,20 @@ const retrieveFiles = () => {
     .then(files => files.filter(file => fileFilter(file)));
 };
 
+const getContents = (filename) => {
+  return new Promise((resolve, reject) => {
+    fs.readFile(filename, 'utf-8', (err, data) => {
+      if (err) reject(err);
+      resolve(data);
+    });
+  });
+};
+
 module.exports = {
   retrieveFiles,
   filterByLeague,
   filterByTeam,
   filterByYear,
-  fileFilter
+  fileFilter,
+  getContents
 };

@@ -126,4 +126,22 @@ describe.only('File Manager', () => {
         });
     });
   });
+  describe('Get Contents', () => {
+    it ('Resolves with the contents of the file when the file exists', () => {
+      return fileManager.getContents('./test/testFiles/b.json')
+        .then(contents => {
+          const result = JSON.parse(contents);
+          expect(result.test).to.equal('Test');
+        });
+    });
+    it('Rejects with error when file does not exist', () => {
+      return fileManager.getContents('./test/testFiles/doesNoytExist.json')
+        .then(contents => {
+          expect.fail(contents);
+        })
+        .catch(err => {
+          expect(err.code).to.equal('ENOENT');
+        })
+    })
+  });
 });
