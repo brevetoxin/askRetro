@@ -1,7 +1,10 @@
 'use strict';
 
+const uuid = require('uuid/v4');
 const log = require('./logger');
 const eventBus = require('./eventBus');
+const play = require('./play');
+
 
 class Game {
   constructor(id) {
@@ -19,10 +22,17 @@ class Game {
           fielding: {}
         }
       },
-      inning: 1
+      inning: 1,
+      outs: 0
     };
     this.info = {};
     return this;
+  }
+
+  resetInning(inning) {
+    eventBus.trigger('newInning', this.state, { inning });
+    this.state.inning = inning;
+    this.state.outs = 0;
   }
 
   lineupChange(id, name, team, battingOrder, fieldingPosition) {
@@ -47,7 +57,15 @@ class Game {
   }
 
   processPlay(inning, team, id, count, pitches, play) {
-    console.log(play);
+    if (inning !== this.state.inning) this.resetInning(inning);
+    this.state.currentPlay = uuid();
+    eventBus.trigger('processPlay', this.state, { inning, team, id, count, pitches, play });
+    const playSplit1 = play.split('/');
+    const basicPlay = playSplit1[0];
+    const playSplit2 = playSplit1[1].split('.');
+    const modifiers = playSplit2[0];
+    const runnerResults = playSplit2[1];
+    play.process(play);
   }
 
   processLine(line) {
