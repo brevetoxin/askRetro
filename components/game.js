@@ -57,14 +57,17 @@ class Game {
   }
 
   processPlay(inning, team, id, count, pitches, play) {
+    const modifiers = [];
     if (inning !== this.state.inning) this.resetInning(inning);
     this.state.currentPlay = uuid();
     eventBus.trigger('processPlay', this.state, { inning, team, id, count, pitches, play });
-    const playSplit1 = play.split('/');
-    const basicPlay = playSplit1[0];
-    const playSplit2 = playSplit1[1].split('.');
-    const modifiers = playSplit2[0];
-    const runnerResults = playSplit2[1];
+    const playSplit1 = play.split('.');
+    const runnerResults = playSplit1[1];
+    const playSplit2 = playSplit1[1].split('/');
+    const basicPlay = playSplit2[0];
+    for (let i = 1; i < playSplit2.length; i++) {
+      modifiers.push(playSplit2[i]);
+    }
     play.process(play);
   }
 
