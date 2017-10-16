@@ -4,6 +4,8 @@ const uuid = require('uuid/v4');
 const log = require('./logger');
 const eventBus = require('./eventBus');
 const play = require('./play');
+const Modifiers = require('./modifiers');
+
 
 
 class Game {
@@ -56,19 +58,16 @@ class Game {
     this.lineupChange(id, name, team, battingOrder, fieldingPosition);
   }
 
-  processPlay(inning, team, id, count, pitches, play) {
-    const modifiers = [];
+  processPlay(inning, team, id, count, pitches, playInfo) {
     if (inning !== this.state.inning) this.resetInning(inning);
     this.state.currentPlay = uuid();
-    eventBus.trigger('processPlay', this.state, { inning, team, id, count, pitches, play });
-    const playSplit1 = play.split('.');
+    eventBus.trigger('processPlay', this.state, { inning, team, id, count, pitches, playInfo });
+    const playSplit1 = playInfo.split('.');
     const runnerResults = playSplit1[1];
-    const playSplit2 = playSplit1[1].split('/');
+    const playSplit2 = playSplit1[0].split('/');
     const basicPlay = playSplit2[0];
-    for (let i = 1; i < playSplit2.length; i++) {
-      modifiers.push(playSplit2[i]);
-    }
-    play.process(play);
+    const modifiers = new Modifiers(playSplit2.slice(1));
+    play.process(this.state, basicPlay, modifiers, runnerResults);
   }
 
   processLine(line) {
