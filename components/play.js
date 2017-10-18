@@ -10,7 +10,7 @@ const process = (gameState, basicPlay, modifiers, runnerResults) => {
 }
 
 const explicitOuts = (playInfo) => {
-  const outGroups = playInfo.match(/\([1-3]\)|\(B\)/);
+  const outGroups = playInfo.match(/\([1-3]\)|\(B\)/g);
   let runnersOut = [];
   if (outGroups) {
     runnersOut = outGroups.map(group => group[1]);
