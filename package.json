@@ -1,6 +1,7 @@
 {
   "name": "askRetro",
   "version": "0.0.1",
+  "license": "MIT",
   "dependencies": {
     "recursive-readdir": "^2.2.1",
     "uuid": "^3.1.0",

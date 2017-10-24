@@ -13,7 +13,7 @@ class Game {
     log.game(`Initializing new game: ${id}`);
     this.state = {
       id: id,
-      baseRunners: { 1: null, 2: null, 3: null },
+      baseRunners: { 0: null, 1: null, 2: null, 3: null },
       lineups: {
         0: {
           batting: {},
