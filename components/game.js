@@ -25,16 +25,24 @@ class Game {
         }
       },
       inning: 1,
-      outs: 0
+      outs: 0,
+      currentBatter: null,
+      currentPitcher: null,
+      score: {
+        0: 0,
+        1: 0
+      },
+      battingTeam = 0
     };
     this.info = {};
     return this;
   }
 
-  resetInning(inning) {
+  resetInning(inning, team) {
     eventBus.trigger('newInning', this.state, { inning });
     this.state.inning = inning;
     this.state.outs = 0;
+    this.state.battingTeam = team;
   }
 
   lineupChange(id, name, team, battingOrder, fieldingPosition) {
@@ -59,8 +67,9 @@ class Game {
   }
 
   processPlay(inning, team, id, count, pitches, playInfo) {
-    if (inning !== this.state.inning) this.resetInning(inning);
+    if (inning !== this.state.inning || team !== this.state.battingTeam) this.resetInning(inning, team);
     this.state.currentPlay = uuid();
+    this.state.currentBatter = id;
     eventBus.trigger('processPlay', this.state, { inning, team, id, count, pitches, playInfo });
     const playSplit1 = playInfo.split('.');
     const runnerResults = playSplit1[1];
