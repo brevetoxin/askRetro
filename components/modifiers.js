@@ -3,7 +3,7 @@
 class Modifiers {
   constructor(mods) {
     this.mods = [];
-    for (let i = 1; i < mods.length; i++) {
+    for (let i = 0; i < mods.length; i++) {
       this.mods.push(mods[i]);
     }
     return this;

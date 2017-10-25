@@ -27,12 +27,11 @@ class Game {
       inning: 1,
       outs: 0,
       currentBatter: null,
-      currentPitcher: null,
       score: {
         0: 0,
         1: 0
       },
-      battingTeam = 0
+      battingTeam: 0
     };
     this.info = {};
     return this;

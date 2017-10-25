@@ -5,9 +5,10 @@ const eventBus = require('./eventBus');
 
 const process = (gameState, basicPlay, modifiers, runnerResults) => {
   gameState.baseRunners[0] = gameState.currentBatter;
-  if (/^[1-9]$/.test(basicPlay) && !modifiers.check(/^G$/)) flyBallOut(gameState, basicPlay, modifiers, runnerResults);
-  if (/^[1-9]$/.test(basicPlay) && modifiers.check(/^G$/)) groundBallOut(gameState, basicPlay, modifiers, runnerResults);
-  if (/^[1-9][1-9]+(\([1-3]\)|\(B\))?$/.test(basicPlay)) groundBallOut(gameState, basicPlay, modifiers, runnerResults);
+  if (/^[1-9]$/.test(basicPlay) && !modifiers.check(/^G$/)) flyBallOut(gameState, basicPlay, modifiers, runnerResults); // eg. 8/F78
+  if (/^[1-9]$/.test(basicPlay) && modifiers.check(/^G$/)) groundBallOut(gameState, basicPlay, modifiers, runnerResults); // eg. 3/G
+  if (/^[1-9][1-9]+(\([1-3]\)|\(B\))$/.test(basicPlay)) groundBallOut(gameState, basicPlay, modifiers, runnerResults, 1); // eg. 63/G
+
 }
 
 const byRunner = (a, b) => {
@@ -93,11 +94,11 @@ const advanceRunners = (gameState, explicitOuts, implicitBatterPosition, runnerR
 const flyBallOut = (gameState, playInfo, modifiers, runnerResults) => {
   log.play(`Fly ball out: ${playInfo}|${modifiers.mods}|${runnerResults}`);
   eventBus.trigger('flyBallOut', gameState, { playInfo, modifiers, runnerResults });
-  advanceRunners(gameState, undefined, 'O', runnerResults);
+  advanceRunners(gameState, [], 'O', runnerResults);
 }
 
 const groundBallOut = (gameState, playInfo, modifiers, runnerResults, totalOuts) => {
-  const implicitBatterPosition = 0;
+  let implicitBatterPosition = 0;
   log.play(`Ground ball out: ${playInfo}`);
   totalOuts = totalOuts || 1;
   eventBus.trigger('groundBallOut', gameState, { playInfo, modifiers, runnerResults });
