@@ -38,6 +38,7 @@ class Game {
   }
 
   resetInning(inning, team) {
+    log.game(`New Inning: ${inning}. Batting team: ${team}`);
     eventBus.trigger('newInning', this.state, { inning });
     this.state.inning = inning;
     this.state.outs = 0;
