@@ -67,6 +67,7 @@ class Game {
   }
 
   processPlay(inning, team, id, count, pitches, playInfo) {
+    console.log(playInfo);
     if (inning !== this.state.inning || team !== this.state.battingTeam) this.resetInning(inning, team);
     this.state.currentPlay = uuid();
     this.state.currentBatter = id;
