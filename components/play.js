@@ -22,11 +22,11 @@ const processPlay = (gameState, basicPlay, modifiers, runnerResults) => {
   else if (/^[1-9]*E[1-9]*$/.test(basicPlay)) fieldingError(gameState, basicPlay, modifiers, runnerResults, 1); // eg., E1/TH/BG15.1-3 (fielding error)
   else if (/^FC[1-9]$/.test(basicPlay)) groundBallOut(gameState, basicPlay, modifiers, runnerResults, 1); //eg., FC5/G5.3XH(52) (fielder's choice)
   else if (/^FLE[1-9]$/.test(basicPlay)) fieldingError(gameState, basicPlay, modifiers, runnerResults, null); //eg., FLE5/P5F (error on foul fly ball)
-  else if (/^(H|HR)[1-9]?$/.test(basicPlay)) hit(gameState, basicPlay, modifiers, runnerResults, 4); //eg., H/L7D (home run)
+  else if (/^(H|HR)[1-9]*?$/.test(basicPlay)) hit(gameState, basicPlay, modifiers, runnerResults, 4); //eg., H/L7D (home run)
   else if (/^HP$/.test(basicPlay)) hitByPitch(gameState, basicPlay, modifiers, runnerResults, 1); //eg., HP (hit by pitch)
   else if (/^K[1-9]*$/.test(basicPlay)) strikeout(gameState, basicPlay, modifiers, runnerResults); //eg., K (strikeout)
   else if (/^K([1-9][1-9])?\+(SB([2-3]|H)(;SB([2-3]|H))*|CS([2-3]|H)|WP|OA|PO[1-3]|PB|E[1-9])(\([1-9]*\))?$/.test(basicPlay)) strikeout(gameState, basicPlay, modifiers, runnerResults); //eg. K+WP (strikeout plus event)
-  else if (/^W|IW?$/.test(basicPlay)) walk(gameState, basicPlay, modifiers, runnerResults); //eg., IW (walk)
+  else if (/^(W|IW)(\+(OA|PB|WP|(SB([2-3]|H))))?$/.test(basicPlay)) walk(gameState, basicPlay, modifiers, runnerResults); //eg., IW (walk)
   else if (/^NP$/.test(basicPlay)) { }
   else if (/^BK$/.test(basicPlay)) balk(gameState, basicPlay, modifiers, runnerResults); //eg., BK (balk)
   else if (/^(CS([2-3]|H)|POCS([203]|H))(\([1-9]*\))?$/.test(basicPlay)) caughtStealing(gameState, basicPlay, modifiers, runnerResults); //eg., CS2 (caught stealing)
