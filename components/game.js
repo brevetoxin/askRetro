@@ -67,6 +67,7 @@ class Game {
   }
 
   processPlay(inning, team, id, count, pitches, playInfo) {
+    console.log(playInfo);
     if (inning !== this.state.inning || team !== this.state.battingTeam) this.resetInning(inning, team);
     this.state.currentPlay = uuid();
     this.state.currentBatter = id;
@@ -76,7 +77,7 @@ class Game {
     const playSplit2 = playSplit1[0].split('/');
     const basicPlay = playSplit2[0];
     const modifiers = new Modifiers(playSplit2.slice(1));
-    play.process(this.state, basicPlay, modifiers, runnerResults);
+    play.processPlay(this.state, basicPlay, modifiers, runnerResults);
   }
 
   processLine(line) {
