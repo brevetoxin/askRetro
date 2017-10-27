@@ -28,11 +28,11 @@ const processPlay = (gameState, basicPlay, modifiers, runnerResults) => {
   else if (/^W|IW?$/.test(basicPlay)) walk(gameState, basicPlay, modifiers, runnerResults); //eg., IW (walk)
   else if (/^NP$/.test(basicPlay)) { }
   else if (/^BK$/.test(basicPlay)) balk(gameState, basicPlay, modifiers, runnerResults); //eg., BK (balk)
-  else if (/^CS([2-3]|H)(\([1-9]*\))?$/.test(basicPlay)) caughtStealing(gameState, basicPlay, modifiers, runnerResults); //eg., CS2 (caught stealing)
+  else if (/^(CS([2-3]|H)|POCS([203]|H))(\([1-9]*\))?$/.test(basicPlay)) caughtStealing(gameState, basicPlay, modifiers, runnerResults); //eg., CS2 (caught stealing)
   else if (/^DI$/.test(basicPlay)) defensiveIndifference(gameState, basicPlay, modifiers, runnerResults); //eg., DI (defensive Indifference)
   else if (/^OA$/.test(basicPlay)) otherAction(gameState, basicPlay, modifiers, runnerResults); //eg., OA (misc)
   else if (/^(PB|WP)$/.test(basicPlay)) wildPitch(gameState, basicPlay, modifiers, runnerResults); // eg., PB (passed ball or wild pitch)
-  else if (/^(PO|POCS)([1-3]|H)(\(.*\))?$/.test(basicPlay)) pickOff(gameState, basicPlay, modifiers, runnerResults); // eg., POCS2(24) (picked off)
+  else if (/^(PO)[1-3](\(.*\))?$/.test(basicPlay)) pickOff(gameState, basicPlay, modifiers, runnerResults); // eg., POCS2(24) (picked off)
   else if (/^SB([2-3]|H)$/.test(basicPlay)) stolenBase(gameState, basicPlay, modifiers, runnerResults); // eg., SB2 (stolen base);
   else {
     log.play('Something else', basicPlay);
@@ -129,7 +129,9 @@ const balk = (gameState, playInfo, modifiers, runnerResults) => {
 const caughtStealing = (gameState, playInfo, modifiers, runnerResults) => {
   log.play(`Caught Stealing: ${playInfo}|${modifiers.mods}|${runnerResults}`);
   eventBus.trigger('caughtStealing', gameState, { playInfo, modifiers, runnerResults });
-  const targetBase = playInfo[2] === 'H' ? 4 : Number(playInfo[2]);
+  let targetBase;
+  if (playInfo[2] === 'C') targetBase = playInfo[4] === 'H' ? 4 : Number(playInfo[4]);
+  else targetBase = playInfo[2] === 'H' ? 4 : Number(playInfo[2]);
   gameState.baseRunners[targetBase - 1] = null;
   recordOut(gameState, targetBase -1, targetBase);
   advanceRunners(gameState, [], null, runnerResults);
