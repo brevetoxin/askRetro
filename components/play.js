@@ -5,12 +5,12 @@ const eventBus = require('./eventBus');
 
 const processPlay = (gameState, basicPlay, modifiers, runnerResults) => {
   gameState.baseRunners[0] = gameState.currentBatter;
-  basicPlay = basicPlay.replace('!', '');
+  basicPlay = basicPlay.replace(/!/g, '');
   if (/^[1-9]$/.test(basicPlay) && !modifiers.check(/^G$/)) flyBallOut(gameState, basicPlay, modifiers, runnerResults); // eg. 8/F78 (fly ball out)
   else if (/^[1-9]$/.test(basicPlay) && modifiers.check(/^G$/)) groundBallOut(gameState, basicPlay, modifiers, runnerResults); // eg. 3/G (ground ball out)
   else if (/^[1-9]\(([1-3]|H)\)$/.test(basicPlay) && modifiers.check(/^G(\+|-)?$/)) groundBallOut(gameState, basicPlay, modifiers, runnerResults); // eg., 6(1) (force out)
   else if (/^[1-9][1-9]+(\([1-3]\)|\(B\))?$/.test(basicPlay)) groundBallOut(gameState, basicPlay, modifiers, runnerResults); // eg. 63/G  (ground ball out)
-  else if (modifiers.check(/^GDP$/) || (modifiers.check(/^G(\+|-)?$/) && modifiers.check(/^DP$/))) groundBallOut(gameState, basicPlay, modifiers, runnerResults, 2); //eg., 64(1)3/GDP/G6 (ground into double play)
+  else if (modifiers.check(/^GDP$/) || (modifiers.check(/^B?G(\+|-)?$/) && modifiers.check(/^DP$/))) groundBallOut(gameState, basicPlay, modifiers, runnerResults, 2); //eg., 64(1)3/GDP/G6 (ground into double play)
   else if (modifiers.check(/^LDP$/)) flyBallOut(gameState, basicPlay, modifiers, runnerResults); // eg. 8(B)84(2)/LDP/L8 (lined into double play)
   else if (modifiers.check(/^LTP$/)) flyBallOut(gameState, basicPlay, modifiers, runnerResults); // eg. 1(B)16(2)63(1)/LTP/L1 (lined into triple play)
   else if (modifiers.check(/^GTP$/)) groundBallOut(gameState, basicPlay, modifiers, runnerResults); // eg., 6(2)4(1)3/GTP/G6 (ground into triple play)
@@ -25,11 +25,11 @@ const processPlay = (gameState, basicPlay, modifiers, runnerResults) => {
   else if (/^(H|HR)[1-9]*?$/.test(basicPlay)) hit(gameState, basicPlay, modifiers, runnerResults, 4); //eg., H/L7D (home run)
   else if (/^HP$/.test(basicPlay)) hitByPitch(gameState, basicPlay, modifiers, runnerResults, 1); //eg., HP (hit by pitch)
   else if (/^K[1-9]*$/.test(basicPlay)) strikeout(gameState, basicPlay, modifiers, runnerResults); //eg., K (strikeout)
-  else if (/^K([1-9][1-9])?\+(SB([2-3]|H)(;SB([2-3]|H))*|CS([2-3]|H)|WP|OA|PO[1-3]|PB|E[1-9])(\([1-9]*\))?$/.test(basicPlay)) strikeout(gameState, basicPlay, modifiers, runnerResults); //eg. K+WP (strikeout plus event)
-  else if (/^(W|IW)(\+(OA|PB|WP|(SB([2-3]|H))))?$/.test(basicPlay)) walk(gameState, basicPlay, modifiers, runnerResults); //eg., IW (walk)
+  else if (/^K([1-9][1-9])?\+(SB([2-3]|H)(;SB([2-3]|H))*|CS([2-3]|H)|WP|OA|DI|PO[1-3](\([1-9]*E*[1-9]*(\/.+)?\))?|PB|E[1-9])(\([1-9]*\))?/.test(basicPlay)) strikeout(gameState, basicPlay, modifiers, runnerResults); //eg. K+WP (strikeout plus event)
+  else if (/^(W|IW)(\+(OA|PB|(CS([2-3]|H)|POCS([2-3]|H))(\([1-9]*E*[1-9]*\))?|WP|DI|(SB([2-3]|H))))?$/.test(basicPlay)) walk(gameState, basicPlay, modifiers, runnerResults); //eg., IW (walk)
   else if (/^NP$/.test(basicPlay)) { }
   else if (/^BK$/.test(basicPlay)) balk(gameState, basicPlay, modifiers, runnerResults); //eg., BK (balk)
-  else if (/^(CS([2-3]|H)|POCS([203]|H))(\([1-9]*\))?$/.test(basicPlay)) caughtStealing(gameState, basicPlay, modifiers, runnerResults); //eg., CS2 (caught stealing)
+  else if (/^(CS([2-3]|H)|POCS([2-3]|H))(\([1-9]*E*[1-9]*\))?$/.test(basicPlay)) caughtStealing(gameState, basicPlay, modifiers, runnerResults); //eg., CS2 (caught stealing)
   else if (/^DI$/.test(basicPlay)) defensiveIndifference(gameState, basicPlay, modifiers, runnerResults); //eg., DI (defensive Indifference)
   else if (/^OA$/.test(basicPlay)) otherAction(gameState, basicPlay, modifiers, runnerResults); //eg., OA (misc)
   else if (/^(PB|WP)$/.test(basicPlay)) wildPitch(gameState, basicPlay, modifiers, runnerResults); // eg., PB (passed ball or wild pitch)
@@ -134,7 +134,7 @@ const caughtStealing = (gameState, playInfo, modifiers, runnerResults) => {
   if (playInfo[2] === 'C') targetBase = playInfo[4] === 'H' ? 4 : Number(playInfo[4]);
   else targetBase = playInfo[2] === 'H' ? 4 : Number(playInfo[2]);
   gameState.baseRunners[targetBase - 1] = null;
-  recordOut(gameState, targetBase -1, targetBase);
+  if (/\([1-9]*E[1-9]*\)/.test(playInfo)) recordOut(gameState, targetBase -1, targetBase);
   advanceRunners(gameState, [], null, runnerResults);
 };
 
@@ -226,13 +226,17 @@ const strikeout = (gameState, playInfo, modifiers, runnerResults) => {
   let implicitBatterPosition = 0;
   log.play(`Strikeout: ${playInfo}`);
   eventBus.trigger('strikeout', gameState, { playInfo, modifiers, runnerResults });
-  advanceRunners(gameState, [], implicitBatterPosition, runnerResults);
+  const additionalPlays = playInfo.split('+');
+  if (additionalPlays.length > 1) processPlay(gameState, additionalPlays[1], modifiers, runnerResults)
+  else advanceRunners(gameState, [], implicitBatterPosition, runnerResults);
 };
 
 const walk = (gameState, playInfo, modifiers, runnerResults) => {
   log.play(`Walk: ${playInfo}|${modifiers.mods}|${runnerResults}`);
   eventBus.trigger('walk', gameState, { playInfo, modifiers, runnerResults });
-  advanceRunners(gameState, [], 1, runnerResults);
+  const additionalPlays = playInfo.split('+');
+  if (additionalPlays.length > 1) processPlay(gameState, additionalPlays[1], modifiers, runnerResults)
+  else advanceRunners(gameState, [], 1, runnerResults);
 };
 
 const wildPitch = (gameState, playInfo, modifiers, runnerResults) => {

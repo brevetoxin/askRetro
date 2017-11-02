@@ -74,7 +74,7 @@ class Game {
     eventBus.trigger('processPlay', this.state, { inning, team, id, count, pitches, playInfo });
     const playSplit1 = playInfo.split('.');
     const runnerResults = playSplit1[1];
-    const playSplit2 = playSplit1[0].split('/');
+    const playSplit2 = playSplit1[0].split(/\/(?![^(]*\))/);
     const basicPlay = playSplit2[0];
     const modifiers = new Modifiers(playSplit2.slice(1));
     play.processPlay(this.state, basicPlay, modifiers, runnerResults);
