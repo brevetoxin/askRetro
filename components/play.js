@@ -6,7 +6,7 @@ const eventBus = require('./eventBus');
 const processPlay = (gameState, basicPlay, modifiers, runnerResults) => {
   gameState.baseRunners[0] = gameState.currentBatter;
   basicPlay = basicPlay.replace(/!/g, '');
-  if (/^[1-9]$/.test(basicPlay) && !modifiers.check(/^G$/)) flyBallOut(gameState, basicPlay, modifiers, runnerResults); // eg. 8/F78 (fly ball out)
+  if (/^[1-9](\([1-9]*\))?$/.test(basicPlay) && !modifiers.check(/^G$/)) flyBallOut(gameState, basicPlay, modifiers, runnerResults); // eg. 8/F78 (fly ball out)
   else if (/^[1-9]$/.test(basicPlay) && modifiers.check(/^G$/)) groundBallOut(gameState, basicPlay, modifiers, runnerResults); // eg. 3/G (ground ball out)
   else if (/^[1-9]\(([1-3]|H)\)$/.test(basicPlay) && modifiers.check(/^G(\+|-)?$/)) groundBallOut(gameState, basicPlay, modifiers, runnerResults); // eg., 6(1) (force out)
   else if (/^[1-9][1-9]+(\([1-3]\)|\(B\))?$/.test(basicPlay)) groundBallOut(gameState, basicPlay, modifiers, runnerResults); // eg. 63/G  (ground ball out)
@@ -29,12 +29,12 @@ const processPlay = (gameState, basicPlay, modifiers, runnerResults) => {
   else if (/^(W|IW)(\+(OA|PB|(CS([2-3]|H)|POCS([2-3]|H))(\([1-9]*E*[1-9]*\))?|WP|DI|(SB([2-3]|H))))?$/.test(basicPlay)) walk(gameState, basicPlay, modifiers, runnerResults); //eg., IW (walk)
   else if (/^NP$/.test(basicPlay)) { }
   else if (/^BK$/.test(basicPlay)) balk(gameState, basicPlay, modifiers, runnerResults); //eg., BK (balk)
-  else if (/^(CS([2-3]|H)|POCS([2-3]|H))(\([1-9]*E*[1-9]*\))?$/.test(basicPlay)) caughtStealing(gameState, basicPlay, modifiers, runnerResults); //eg., CS2 (caught stealing)
+  else if (/^(CS([2-3]|H)|POCS([2-3]|H))(\([1-9]*E*[1-9]*(\/TH)?\))?$/.test(basicPlay)) caughtStealing(gameState, basicPlay, modifiers, runnerResults); //eg., CS2 (caught stealing)
   else if (/^DI$/.test(basicPlay)) defensiveIndifference(gameState, basicPlay, modifiers, runnerResults); //eg., DI (defensive Indifference)
   else if (/^OA$/.test(basicPlay)) otherAction(gameState, basicPlay, modifiers, runnerResults); //eg., OA (misc)
   else if (/^(PB|WP)$/.test(basicPlay)) wildPitch(gameState, basicPlay, modifiers, runnerResults); // eg., PB (passed ball or wild pitch)
   else if (/^(PO)[1-3](\(.*\))?$/.test(basicPlay)) pickOff(gameState, basicPlay, modifiers, runnerResults); // eg., POCS2(24) (picked off)
-  else if (/^SB([2-3]|H)(;SB([2-3]|H))*$/.test(basicPlay)) stolenBase(gameState, basicPlay, modifiers, runnerResults); // eg., SB2 (stolen base);
+  else if (/^SB([2-3]|H(\(UR\))?)(;SB([2-3]|H(\(UR\))?))*$/.test(basicPlay)) stolenBase(gameState, basicPlay, modifiers, runnerResults); // eg., SB2 (stolen base);
   else {
     log.play('Something else', basicPlay);
     process.exit();
