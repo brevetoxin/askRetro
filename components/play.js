@@ -85,6 +85,10 @@ const advanceRunners = (gameState, explicitOuts, implicitBatterPosition, runnerR
     let earned = true;
     if (/\(UR\)/.test(event)) earned = false;
     const runner = event[0] === 'B' ? 0 : Number(event[0]);
+    if (runner === null) {
+      log.error(`Expected a runner at ${runner} but found null`);
+      process.exit();
+    }
     const out = event[1] === 'X';
     const finalBase = event[2] === 'H' ? 4 : Number(event[2]);
     return {
