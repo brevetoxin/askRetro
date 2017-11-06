@@ -43,6 +43,7 @@ class Game {
     this.state.inning = inning;
     this.state.outs = 0;
     this.state.battingTeam = team;
+    this.state.baseRunners = { 0: null, 1: null, 2: null, 3: null };
   }
 
   lineupChange(id, name, team, battingOrder, fieldingPosition) {

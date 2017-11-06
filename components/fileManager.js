@@ -15,9 +15,10 @@ const fileFilter = (filePath => {
 
 const filterByLeague = ((filePath) => {
   const league = config.get('league');
+  const fileParts = filePath.split('.');
+  const extension = fileParts.pop();
+  if (extension !== 'EVA' && extension !== 'EVN') return false;
   if (league) {
-    const fileParts = filePath.split('.');
-    const extension = fileParts.pop();
     if (league === 'A') return extension === 'EVA';
     if (league === 'N') return extension === 'EVN';
     return false;
@@ -37,8 +38,8 @@ const filterByTeam = (filePath => {
 });
 
 const filterByYear = (filePath => {
-  const startYear = config.get('startYear');
-  const endYear = config.get('endYear');
+  const startYear = Number(config.get('startYear'));
+  const endYear = Number(config.get('endYear'));
   if (startYear || endYear) {
     const start = startYear < 1 ? new Date().getFullYear() + startYear : startYear;
     const end = endYear < 1 ? new Date().getFullYear() + endYear : endYear;
