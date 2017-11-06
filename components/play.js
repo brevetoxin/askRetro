@@ -48,6 +48,15 @@ const byRunner = (a, b) => {
   return 0;
 };
 
+const getRunnerEvents = (runnerResults) => runnerResults ? runnerResults.split(';') : [];
+
+const runnerResultsAreExplicit = (runnerResults, runner) => {
+  const runnerEvents = getRunnerEvents(runnerResults);
+  if (runnerEvents.find(event => Number(event[0]) === runner)) return true;
+  return false;
+};
+
+
 const recordOut = (gameState, runner, outAt) => {
   eventBus.trigger('out', gameState, { runner });
   gameState.outs++;
@@ -81,7 +90,7 @@ const advanceRunners = (gameState, explicitOuts, implicitBatterPosition, runnerR
     gameState.baseRunners[runner] = null;
     recordOut(gameState, runner, outAt);
   });
-  const runnerEvents = runnerResults ? runnerResults.split(';') : [];
+  const runnerEvents = getRunnerEvents(runnerResults);
   const withoutDupes = runnerEvents.filter((event, index, self) => {
     return self.indexOf(event) === index;
   });
@@ -157,8 +166,10 @@ const caughtStealing = (gameState, playInfo, modifiers, runnerResults) => {
     recordOut(gameState, targetBase -1, targetBase);
     gameState.baseRunners[targetBase - 1] = null;
   } else {
-    if (runnerResults && runnerResults.length > 0) runnerResults += `;${targetBase - 1}-${targetBase}`;
-    else runnerResults = `${targetBase - 1}-${targetBase}`;
+    if (!runnerResultsAreExplicit(runnerResults, targetBase - 1)) {
+      if (runnerResults && runnerResults.length > 0) runnerResults += `;${targetBase - 1}-${targetBase}`;
+      else runnerResults = `${targetBase - 1}-${targetBase}`;
+    }
   }
   advanceRunners(gameState, [], null, runnerResults);
 };
