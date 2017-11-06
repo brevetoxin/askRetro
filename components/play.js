@@ -5,6 +5,7 @@ const eventBus = require('./eventBus');
 
 const processPlay = (gameState, basicPlay, modifiers, runnerResults) => {
   gameState.baseRunners[0] = gameState.currentBatter;
+  console.log(`Situation: ${JSON.stringify(gameState.baseRunners)}`);
   basicPlay = basicPlay.replace(/!/g, '');
   if (/^[1-9](\(([1-9]|B)*\))?$/.test(basicPlay) && !modifiers.check(/^G$/)) flyBallOut(gameState, basicPlay, modifiers, runnerResults); // eg. 8/F78 (fly ball out)
   else if (/^[1-9]$/.test(basicPlay) && modifiers.check(/^G$/)) groundBallOut(gameState, basicPlay, modifiers, runnerResults); // eg. 3/G (ground ball out)
@@ -20,12 +21,12 @@ const processPlay = (gameState, basicPlay, modifiers, runnerResults) => {
   else if (/^T[1-9]*$/.test(basicPlay)) hit(gameState, basicPlay, modifiers, runnerResults, 3); // eg., T8 (triple)
   else if (/^DGR[1-9]*$/.test(basicPlay)) hit(gameState, basicPlay, modifiers, runnerResults, 2); // eg., DGR/L9LS.2-H (ground rule double)
   else if (/^[1-9]*E[1-9]*$/.test(basicPlay)) fieldingError(gameState, basicPlay, modifiers, runnerResults, 1); // eg., E1/TH/BG15.1-3 (fielding error)
-  else if (/^FC[1-9]$/.test(basicPlay)) groundBallOut(gameState, basicPlay, modifiers, runnerResults, 1); //eg., FC5/G5.3XH(52) (fielder's choice)
+  else if (/^FC[1-9]$/.test(basicPlay)) groundBallOut(gameState, basicPlay, modifiers, runnerResults, 1, 1); //eg., FC5/G5.3XH(52) (fielder's choice)
   else if (/^FLE[1-9]$/.test(basicPlay)) fieldingError(gameState, basicPlay, modifiers, runnerResults, null); //eg., FLE5/P5F (error on foul fly ball)
   else if (/^(H|HR)[1-9]*?$/.test(basicPlay)) hit(gameState, basicPlay, modifiers, runnerResults, 4); //eg., H/L7D (home run)
   else if (/^HP$/.test(basicPlay)) hitByPitch(gameState, basicPlay, modifiers, runnerResults, 1); //eg., HP (hit by pitch)
-  else if (/^K[1-9]*$/.test(basicPlay)) strikeout(gameState, basicPlay, modifiers, runnerResults); //eg., K (strikeout)
-  else if (/^K([1-9]*)?\+(SB([2-3]|H)(;SB([2-3]|H))*|CS([2-3]|H)|WP|OA|DI|PO[1-3](\([1-9]*E*[1-9]*(\/.+)?\))?|POCS([2-3]|H)(\([1-9]+\))?|PB|E[1-9])(\([1-9]*\))?/.test(basicPlay)) strikeout(gameState, basicPlay, modifiers, runnerResults); //eg. K+WP (strikeout plus event)
+  else if (/K([1-9]*)?(\+.*)?$/.test(basicPlay)) strikeout(gameState, basicPlay, modifiers, runnerResults); //eg., K (strikeout)
+  // else if (/^K([1-9]*)?\+(SB([2-3]|H)(;SB([2-3]|H))*|CS([2-3]|H)|WP|OA|DI|PO[1-3](\([1-9]*E*[1-9]*(\/.+)?\))?|POCS([2-3]|H)(\([1-9]+\))?|PB|E[1-9])(\([1-9]*\))?/.test(basicPlay)) strikeout(gameState, basicPlay, modifiers, runnerResults); //eg. K+WP (strikeout plus event)
   else if (/^(W|IW)(\+(OA|PB|(CS([2-3]|H)|POCS([2-3]|H))(\([1-9]*E*[1-9]*\))?|WP|DI|(SB([2-3]|H))))?$/.test(basicPlay)) walk(gameState, basicPlay, modifiers, runnerResults); //eg., IW (walk)
   else if (/^NP$/.test(basicPlay)) { }
   else if (/^BK$/.test(basicPlay)) balk(gameState, basicPlay, modifiers, runnerResults); //eg., BK (balk)
@@ -81,14 +82,10 @@ const advanceRunners = (gameState, explicitOuts, implicitBatterPosition, runnerR
     recordOut(gameState, runner, outAt);
   });
   const runnerEvents = runnerResults ? runnerResults.split(';') : [];
-  const events = runnerEvents.map(event => {
+  const rawEvents = runnerEvents.map(event => {
     let earned = true;
     if (/\(UR\)/.test(event)) earned = false;
     const runner = event[0] === 'B' ? 0 : Number(event[0]);
-    if (runner === null) {
-      log.error(`Expected a runner at ${runner} but found null`);
-      process.exit();
-    }
     const out = event[1] === 'X';
     const finalBase = event[2] === 'H' ? 4 : Number(event[2]);
     return {
@@ -98,8 +95,22 @@ const advanceRunners = (gameState, explicitOuts, implicitBatterPosition, runnerR
       earned
     };
   });
+  const events = rawEvents.filter(event => {
+    const sameBaseEvents = rawEvents.filter(event2 => event2.runner === event.runner);
+    if (sameBaseEvents < 2) return true;
+    let furthestBase = 0;
+    sameBaseEvents.forEach(event2 => {
+      if (event2.finalBase > furthestBase) furthestBase = event2.finalBase;
+    });
+    if (event.finalBase === furthestBase) return true;
+    return false;
+  });
   events.sort(byRunner);
   events.forEach(event => {
+    if (gameState.baseRunners[event.runner] === null) {
+      log.error(`Expected a runner at ${event.runner} but found null`);
+      process.exit();
+    }
     if (event.runner === 0) implicitBatterPosition = null;
     if (event.out) {
       recordOut(gameState, event.runner, event.finalBase);
@@ -173,8 +184,8 @@ const flyBallOut = (gameState, playInfo, modifiers, runnerResults) => {
   advanceRunners(gameState, explicitRunnersOut, 0, runnerResults);
 };
 
-const groundBallOut = (gameState, playInfo, modifiers, runnerResults, totalOuts) => {
-  let implicitBatterPosition = 0;
+const groundBallOut = (gameState, playInfo, modifiers, runnerResults, totalOuts, implicitBatterPosition) => {
+  implicitBatterPosition = implicitBatterPosition || 0;
   log.play(`Ground ball out: ${playInfo}`);
   totalOuts = totalOuts || 1;
   eventBus.trigger('groundBallOut', gameState, { playInfo, modifiers, runnerResults, totalOuts });
@@ -215,15 +226,12 @@ const stolenBase = (gameState, playInfo, modifiers, runnerResults) => {
   const stolenBases = playInfo.split(';');
   stolenBases.forEach(stolenBase => {
     const base = stolenBase[2] === 'H' ? 4 : Number(stolenBase[2]);
-    if (base === 4) {
-      let earned = true;
-      if (/\(UR\)/.test(playInfo)) earned = false;
-      runScored(gameState, runner, earned);
-    } else {
-      gameState.baseRunners[base] = gameState.baseRunners[base -1];
-    }
-    gameState.baseRunners[base - 1] = null;
+    const sbString = `${base -1}-${base}`;
+    if (/\(UR\)/.test(stolenBase)) sbString = `${sbString}(UR)`;
+    if (runnerResults.length > 0) runnerResults = `${sbString};${runnerResults}`;
+    else runnerResults = sbString;
   });
+  advanceRunners(gameState, [], null, runnerResults);
 };
 
 const strikeout = (gameState, playInfo, modifiers, runnerResults) => {
@@ -239,8 +247,10 @@ const walk = (gameState, playInfo, modifiers, runnerResults) => {
   log.play(`Walk: ${playInfo}|${modifiers.mods}|${runnerResults}`);
   eventBus.trigger('walk', gameState, { playInfo, modifiers, runnerResults });
   const additionalPlays = playInfo.split('+');
-  if (additionalPlays.length > 1) processPlay(gameState, additionalPlays[1], modifiers, runnerResults)
-  else advanceRunners(gameState, [], 1, runnerResults);
+  if (additionalPlays.length > 1) {
+    processPlay(gameState, additionalPlays[1], modifiers, runnerResults);
+    advanceRunners(gameState, [], 1, null);
+  } else advanceRunners(gameState, [], 1, runnerResults);
 };
 
 const wildPitch = (gameState, playInfo, modifiers, runnerResults) => {
