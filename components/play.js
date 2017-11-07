@@ -30,7 +30,7 @@ const processPlay = (gameState, basicPlay, modifiers, runnerResults) => {
   else if (/^(W|IW)(\+.*)?$/.test(basicPlay)) walk(gameState, basicPlay, modifiers, runnerResults); //eg., IW (walk)
   else if (/^NP$/.test(basicPlay)) { }
   else if (/^BK$/.test(basicPlay)) balk(gameState, basicPlay, modifiers, runnerResults); //eg., BK (balk)
-  else if (/^(CS([2-3]|H)|POCS([2-3]|H))(\([1-9]*E*[1-9]*(\/TH)?\))?$/.test(basicPlay)) caughtStealing(gameState, basicPlay, modifiers, runnerResults); //eg., CS2 (caught stealing)
+  else if (/^(CS([2-3]|H)|POCS([2-3]|H))(\([1-9]*E*[1-9]*(\/TH)?\))?(\(UR\))?$/.test(basicPlay)) caughtStealing(gameState, basicPlay, modifiers, runnerResults); //eg., CS2 (caught stealing)
   else if (/^DI$/.test(basicPlay)) defensiveIndifference(gameState, basicPlay, modifiers, runnerResults); //eg., DI (defensive Indifference)
   else if (/^OA$/.test(basicPlay)) otherAction(gameState, basicPlay, modifiers, runnerResults); //eg., OA (misc)
   else if (/^(PB|WP)$/.test(basicPlay)) wildPitch(gameState, basicPlay, modifiers, runnerResults); // eg., PB (passed ball or wild pitch)
