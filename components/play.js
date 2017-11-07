@@ -35,7 +35,7 @@ const processPlay = (gameState, basicPlay, modifiers, runnerResults) => {
   else if (/^OA$/.test(basicPlay)) otherAction(gameState, basicPlay, modifiers, runnerResults); //eg., OA (misc)
   else if (/^(PB|WP)$/.test(basicPlay)) wildPitch(gameState, basicPlay, modifiers, runnerResults); // eg., PB (passed ball or wild pitch)
   else if (/^(PO)[1-3](\(.*\))?$/.test(basicPlay)) pickOff(gameState, basicPlay, modifiers, runnerResults); // eg., POCS2(24) (picked off)
-  else if (/^SB([2-3]|H(\(UR\))?)(;SB([2-3]|H(\(UR\))?))*$/.test(basicPlay)) stolenBase(gameState, basicPlay, modifiers, runnerResults); // eg., SB2 (stolen base);
+  else if (/^SB([2-3]|H(\(T?UR\))?)(;SB([2-3]|H(\(UR\))?))*$/.test(basicPlay)) stolenBase(gameState, basicPlay, modifiers, runnerResults); // eg., SB2 (stolen base);
   else {
     log.play('Something else', basicPlay);
     process.exit();
