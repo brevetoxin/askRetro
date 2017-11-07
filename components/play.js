@@ -21,7 +21,7 @@ const processPlay = (gameState, basicPlay, modifiers, runnerResults) => {
   else if (/^T[1-9]*$/.test(basicPlay)) hit(gameState, basicPlay, modifiers, runnerResults, 3); // eg., T8 (triple)
   else if (/^DGR[1-9]*$/.test(basicPlay)) hit(gameState, basicPlay, modifiers, runnerResults, 2); // eg., DGR/L9LS.2-H (ground rule double)
   else if (/^[1-9]*E[1-9]*$/.test(basicPlay)) fieldingError(gameState, basicPlay, modifiers, runnerResults, 1); // eg., E1/TH/BG15.1-3 (fielding error)
-  else if (/^FC[1-9]$/.test(basicPlay)) groundBallOut(gameState, basicPlay, modifiers, runnerResults, 1, 1); //eg., FC5/G5.3XH(52) (fielder's choice)
+  else if (/^FC[1-9]?$/.test(basicPlay)) groundBallOut(gameState, basicPlay, modifiers, runnerResults, 1, 1); //eg., FC5/G5.3XH(52) (fielder's choice)
   else if (/^FLE[1-9]$/.test(basicPlay)) fieldingError(gameState, basicPlay, modifiers, runnerResults, null); //eg., FLE5/P5F (error on foul fly ball)
   else if (/^(H|HR)[1-9]*?$/.test(basicPlay)) hit(gameState, basicPlay, modifiers, runnerResults, 4); //eg., H/L7D (home run)
   else if (/^HP$/.test(basicPlay)) hitByPitch(gameState, basicPlay, modifiers, runnerResults, 1); //eg., HP (hit by pitch)
