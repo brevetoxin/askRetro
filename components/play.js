@@ -76,6 +76,8 @@ const explicitOuts = (playInfo) => {
   return runnersOut;
 };
 
+const errorOnPlay = (playInfo) => /\([1-9]*E[1-9]*(\/TH)?\)/.test(playInfo);
+
 const advanceRunners = (gameState, explicitOuts, implicitBatterPosition, runnerResults) => {
   eventBus.trigger('advanceRunners', gameState, explicitOuts, implicitBatterPosition, runnerResults);
   explicitOuts.forEach(runner => {
@@ -161,8 +163,7 @@ const caughtStealing = (gameState, playInfo, modifiers, runnerResults) => {
   let targetBase;
   if (playInfo[2] === 'C') targetBase = playInfo[4] === 'H' ? 4 : Number(playInfo[4]);
   else targetBase = playInfo[2] === 'H' ? 4 : Number(playInfo[2]);
-  const error = /\([1-9]*E[1-9]*(\/TH)?\)/.test(playInfo);
-  if (!error) {
+  if (!errorOnPlay(playInfo)) {
     recordOut(gameState, targetBase -1, targetBase);
     gameState.baseRunners[targetBase - 1] = null;
   } else {
@@ -231,20 +232,13 @@ const otherAction = (gameState, playInfo, modifiers, runnerResults) => {
 const pickOff = (gameState, playInfo, modifiers, runnerResults) => {
   log.play(`Pick Off: ${playInfo}|${modifiers.mods}|${runnerResults}`);
   eventBus.trigger('pickoff', gameState, { playInfo, modifiers, runnerResults });
-  const caughtStealing = playInfo[2] === 'C';
-  let base = playInfo[2] === 'C' ?playInfo[4] : playInfo[2];
-  base = base === 'H' ? 4 : Number(base);
+  let base = playInfo[2] === 'H' ? 4 : Number(playInfo[2]);
   const error = playInfo.match(/E[1-9]/);
-  if (error) fieldingError(gameState, playInfo, modifiers, runnerResults);
-  else {
-    if (caughtStealing) {
-      gameState.baseRunners[base - 1] = null;
-      recordOut(gameState, base -1 , base);
-    } else {
-      gameState.baseRunners[base] = null;
-      recordOut(gameState, base, base);
-    }
+  if (!errorOnPlay(playInfo)) {
+    if (runnerResults && runnerResults.length > 0) runnerResults += `;${base}X${base}`;
+    else runnerResults = `${base}X${base}`;
   }
+  advanceRunners(gameState, [], null, runnerResults);
 };
 
 const stolenBase = (gameState, playInfo, modifiers, runnerResults) => {
