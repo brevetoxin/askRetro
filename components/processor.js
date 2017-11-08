@@ -14,7 +14,7 @@ const process = (fileContents) => {
     if (lineParts[0] === 'id') {
       if (game) game.end();
       game = new Game(lineParts[1]);
-    } else game.processLine(lineParts);
+    } else if (game) game.processLine(lineParts);
   }
   game.end();
 }
