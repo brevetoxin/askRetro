@@ -6,9 +6,6 @@ const fileManager = require('./components/fileManager');
 const processor = require('./components/processor');
 const log = require('./components/logger');
 
-// const config = require('./config/default.json');
-// configuration.configure(config);
-
 const processFiles = () => {
   return fileManager.retrieveFiles(configuration.config)
     .then(files => {

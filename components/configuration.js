@@ -2,7 +2,7 @@
 
 const appRoot = require('app-root-path');
 
-const defaultResourcePath = `${appRoot}/resources`;
+const defaultResourcePath = `${appRoot}/node_modules/askretro/resources`;
 
 const config = {
   resourcePath: defaultResourcePath
