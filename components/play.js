@@ -29,7 +29,7 @@ const processPlay = (gameState, basicPlay, modifiers, runnerResults) => {
   else if (/^HP$/.test(basicPlay)) hitByPitch(gameState, basicPlay, modifiers, runnerResults, 1); //eg., HP (hit by pitch)
   else if (/K([1-9]*)?(\+.*)?$/.test(basicPlay)) strikeout(gameState, basicPlay, modifiers, runnerResults); //eg., K (strikeout)
   // else if (/^K([1-9]*)?\+(SB([2-3]|H)(;SB([2-3]|H))*|CS([2-3]|H)|WP|OA|DI|PO[1-3](\([1-9]*E*[1-9]*(\/.+)?\))?|POCS([2-3]|H)(\([1-9]+\))?|PB|E[1-9])(\([1-9]*\))?/.test(basicPlay)) strikeout(gameState, basicPlay, modifiers, runnerResults); //eg. K+WP (strikeout plus event)
-  else if (/^(W|IW)(\+.*)?$/.test(basicPlay)) walk(gameState, basicPlay, modifiers, runnerResults); //eg., IW (walk)
+  else if (/^(W|IW|I)(\+.*)?$/.test(basicPlay)) walk(gameState, basicPlay, modifiers, runnerResults); //eg., IW (walk)
   else if (/^NP$/.test(basicPlay)) { }
   else if (/^BK$/.test(basicPlay)) balk(gameState, basicPlay, modifiers, runnerResults); //eg., BK (balk)
   else if (/^(CS([2-3]|H)|POCS([2-3]|H))(\([1-9]*E*[1-9]*(\/TH)?\))?(\(UR\))?$/.test(basicPlay)) caughtStealing(gameState, basicPlay, modifiers, runnerResults); //eg., CS2 (caught stealing)
