@@ -8,6 +8,7 @@ const processPlay = (gameState, basicPlay, modifiers, runnerResults) => {
   console.log(`Situation: ${JSON.stringify(gameState.baseRunners)}`);
   basicPlay = basicPlay.replace(/!/g, '');
   basicPlay = basicPlay.replace(/\?/g, '');
+  basicPlay = basicPlay.replace(/#/g, '');
   if (/^[1-9](\(([1-9]|B)*\))?$/.test(basicPlay) && !modifiers.check(/^FO$/) && !modifiers.check(/^G(\+|-)?$/)) flyBallOut(gameState, basicPlay, modifiers, runnerResults); // eg. 8/F78 (fly ball out)
   else if (/^[1-9]$/.test(basicPlay) && modifiers.check(/^G(\+|-)?$/)) groundBallOut(gameState, basicPlay, modifiers, runnerResults); // eg. 3/G (ground ball out)
   else if (/^[1-9]\(([1-3]|H)\)$/.test(basicPlay) && !modifiers.check(/^DP$/) && (modifiers.check(/^G(\+|-)?$/) || modifiers.check(/^FO$/))) groundBallOut(gameState, basicPlay, modifiers, runnerResults); // eg., 6(1) (force out)

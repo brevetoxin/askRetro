@@ -10,7 +10,10 @@ class Modifiers {
   }
 
   check(regex) {
-    return this.mods.find(mod => mod.match(regex))
+    return this.mods.find(mod => {
+      mod = mod.replace(/#/g, '');
+      return mod.match(regex)
+    });
   }
 };
 
