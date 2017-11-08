@@ -78,7 +78,11 @@ class Game {
     const playSplit2 = playSplit1[0].split(/\/(?![^(]*\))/);
     const basicPlay = playSplit2[0];
     const modifiers = new Modifiers(playSplit2.slice(1));
-    play.processPlay(this.state, basicPlay, modifiers, runnerResults);
+    try {
+      play.processPlay(this.state, basicPlay, modifiers, runnerResults);
+    } catch (e) {
+      log.error(e);
+    }
   }
 
   processLine(line) {
