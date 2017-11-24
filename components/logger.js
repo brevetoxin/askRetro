@@ -1,9 +1,9 @@
 'use srrict';
 
-const configuration = require('./configuration');
 const winston = require('winston');
 
 const loggingLevels = {
+  none: 0,
   error: 1,
   processor: 3,
   file: 5,
@@ -23,7 +23,7 @@ winston.addColors(colors);
 
 const logger = new (winston.Logger)({
   transports: [
-    new (winston.transports.Console)({ colorize: true, level: configuration.loggingLevel || 'play' })
+    new (winston.transports.Console)({ colorize: true, level: 'play' })
   ],
   levels: loggingLevels
 });

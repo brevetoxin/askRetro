@@ -18,6 +18,7 @@ const configure = (params) => {
   config.endYear = params.endYear || '';
   config.team = params.team || '';
   config.league = params.league || '';
+  config.loggingLevel = 'none';
 };
 
 const set = (key, value) => {
