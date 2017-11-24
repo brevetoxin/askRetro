@@ -1,7 +1,7 @@
 'use strict';
 
 class Modifiers {
-  constructor(mods) {
+  constructor (mods) {
     this.mods = [];
     for (let i = 0; i < mods.length; i++) {
       this.mods.push(mods[i]);
@@ -9,10 +9,10 @@ class Modifiers {
     return this;
   }
 
-  check(regex) {
+  check (regex) {
     return this.mods.find(mod => {
       mod = mod.replace(/#/g, '');
-      return mod.match(regex)
+      return mod.match(regex);
     });
   }
 };

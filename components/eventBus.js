@@ -13,7 +13,6 @@ const trigger = (event, state, data) => {
       callback(state, data);
     });
   }
-  return;
 };
 
 const triggerAsync = (event, state, data) => {

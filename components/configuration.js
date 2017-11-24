@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 const appRoot = require('app-root-path');
 
@@ -10,7 +10,6 @@ const config = {
 
 const get = (key) => {
   if (config[key]) return config[key];
-  return;
 };
 
 const configure = (params) => {

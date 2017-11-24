@@ -10,7 +10,7 @@ const processFiles = () => {
   return fileManager.retrieveFiles(configuration.config)
     .then(files => {
       const filePromises = files.map(file => processor.processFile(file));
-      return Promise.all(filePromises)
+      return Promise.all(filePromises);
     })
     .catch(err => {
       log.error(err);
@@ -22,3 +22,5 @@ module.exports = {
   configuration,
   processFiles
 };
+
+processFiles();

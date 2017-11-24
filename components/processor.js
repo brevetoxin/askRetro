@@ -17,7 +17,7 @@ const process = (fileContents) => {
     } else if (game) game.processLine(lineParts);
   }
   game.end();
-}
+};
 
 const processFile = (filename) => {
   let fileData = '';
@@ -35,7 +35,7 @@ const processFile = (filename) => {
     .then(() => {
       log.file(`Processing ${filename}`);
       return process(fileData);
-    })
+    });
 };
 
 module.exports = {

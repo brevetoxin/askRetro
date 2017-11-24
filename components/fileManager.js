@@ -1,19 +1,17 @@
-'use strict'
+'use strict';
 
 const readDir = require('recursive-readdir');
 const fs = require('fs');
 const config = require('./configuration');
 
-let targetFiles = [];
-
-const fileFilter = (filePath => {
+const fileFilter = filePath => {
   if (!filterByLeague(filePath)) return false;
   if (!filterByTeam(filePath)) return false;
   if (!filterByYear(filePath)) return false;
   return true;
-});
+};
 
-const filterByLeague = ((filePath) => {
+const filterByLeague = filePath => {
   const league = config.get('league');
   const fileParts = filePath.split('.');
   const extension = fileParts.pop();
@@ -24,9 +22,9 @@ const filterByLeague = ((filePath) => {
     return false;
   }
   return true;
-});
+};
 
-const filterByTeam = (filePath => {
+const filterByTeam = filePath => {
   const team = config.get('team');
   if (team) {
     const pathParts = filePath.split('/');
@@ -35,9 +33,9 @@ const filterByTeam = (filePath => {
     return fileName.substring(4, 7) === team;
   }
   return true;
-});
+};
 
-const filterByYear = (filePath => {
+const filterByYear = filePath => {
   const startYear = Number(config.get('startYear'));
   const endYear = Number(config.get('endYear'));
   if (startYear || endYear) {
@@ -46,13 +44,13 @@ const filterByYear = (filePath => {
     const pathParts = filePath.split('/');
     const fileParts = pathParts.pop().split('.');
     const fileName = fileParts[0];
-    const fileYear = fileName.substring(0,4);
+    const fileYear = fileName.substring(0, 4);
     if (start && Number(fileYear) < start) return false;
     if (end && Number(fileYear) > end) return false;
     return true;
   }
   return true;
-});
+};
 
 const retrieveFiles = () => {
   return readDir(config.get('resourcePath'))
