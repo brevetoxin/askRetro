@@ -4,6 +4,7 @@
   "license": "MIT",
   "dependencies": {
     "app-root-path": "^2.0.1",
+    "lodash": "^4.17.4",
     "recursive-readdir": "^2.2.1",
     "uuid": "^3.1.0",
     "winston": "^2.3.1"
