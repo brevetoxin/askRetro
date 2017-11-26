@@ -1,6 +1,6 @@
 {
   "name": "askretro",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "license": "MIT",
   "dependencies": {
     "app-root-path": "^2.0.1",
