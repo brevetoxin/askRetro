@@ -7,7 +7,7 @@ const processor = require('./components/processor');
 const log = require('./components/logger');
 
 const processFiles = () => {
-  log.transports.console.level = 'configuration.config.loggingLevel';
+  log.transports.console.level = configuration.config.loggingLevel || 'play';
   return fileManager.retrieveFiles(configuration.config)
     .then(files => {
       const filePromises = files.map(file => processor.processFile(file));
