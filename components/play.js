@@ -195,7 +195,7 @@ const hitByPitch = (gameState, playInfo, modifiers, runnerResults, implicitBatte
 
 const fieldingError = (gameState, playInfo, modifiers, runnerResults, implicitBatterPosition) => {
   log.play(`Fielding Error: ${playInfo}|${modifiers.mods}|${runnerResults}`);
-  eventBus.trigger('interference', gameState, { playInfo, modifiers, runnerResults });
+  eventBus.trigger('error', gameState, { playInfo, modifiers, runnerResults });
   advanceRunners(gameState, [], implicitBatterPosition, runnerResults);
 };
 
