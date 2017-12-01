@@ -46,8 +46,12 @@ class Game {
 
   lineupChange (id, name, team, battingOrder, fieldingPosition) {
     eventBus.trigger('lineupChange', this.state, { id, team, battingOrder, fieldingPosition });
+    const previousPlayer = this.state.lineups[team].batting[battingOrder];
     this.state.lineups[team].batting[battingOrder] = id;
     this.state.lineups[team].fielding[fieldingPosition] = id;
+    Object.keys(this.state.baseRunners).forEach(base => {
+      if (this.state.baseRunners[base] === previousPlayer) this.state.baseRunners[base] = id;
+    });
   }
 
   processInfo (type, value) {
