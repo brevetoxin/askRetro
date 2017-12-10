@@ -9,8 +9,11 @@ const Modifiers = require('./modifiers');
 class Game {
   constructor (id) {
     log.game(`Initializing new game: ${id}`);
+    eventBus.trigger('newGame', this.state, { gameId: id });
     this.state = {
       id: id,
+      previousPlay: null,
+      presentPlay: null,
       baseRunners: { 0: null, 1: null, 2: null, 3: null },
       lineups: {
         0: {
@@ -70,6 +73,8 @@ class Game {
   }
 
   processPlay (inning, team, id, count, pitches, playInfo) {
+    this.state.previousPlay = this.state.presentPlay;
+    this.state.presentPlay = { inning, team, id, count, pitches, playInfo };
     if (inning !== this.state.inning || team !== this.state.battingTeam) this.resetInning(inning, team);
     this.state.currentPlay = uuid();
     this.state.currentBatter = id;
