@@ -12,14 +12,14 @@ const processPlay = (gameState, basicPlay, modifiers, runnerResults) => {
   else if (/^[1-9]$/.test(basicPlay) && modifiers.check(/^B*G(\+|-)?$/)) groundBallOut(gameState, basicPlay, modifiers, runnerResults); // eg. 3/G (ground ball out)
   else if (/^[1-9]\(([1-3]|H)\)$/.test(basicPlay) && !modifiers.check(/^DP$/) && (modifiers.check(/^G(\+|-)?$/) || modifiers.check(/^FO$/))) groundBallOut(gameState, basicPlay, modifiers, runnerResults); // eg., 6(1) (force out)
   else if (/^[1-9][1-9]+(\([1-3]\)|\(B\))?$/.test(basicPlay) && !modifiers.check(/^DP$/)) groundBallOut(gameState, basicPlay, modifiers, runnerResults); // eg. 63/G  (ground ball out)
+  else if (/^S[0-9]*\+?$/.test(basicPlay)) hit(gameState, basicPlay, modifiers, runnerResults, 1); // eg., S5 (single)
+  else if (/^D[0-9]*$/.test(basicPlay)) hit(gameState, basicPlay, modifiers, runnerResults, 2);// eg., D9 (double)
+  else if (/^T[0-9]*$/.test(basicPlay)) hit(gameState, basicPlay, modifiers, runnerResults, 3); // eg., T8 (triple)
   else if (modifiers.check(/^GDP$/) || (modifiers.check(/^DP$/) && !/^OA$/.test(basicPlay) && !/^K([1-9]*)?(\+.*)?$/.test(basicPlay) && !/^(PO)[1-3](\(.*\))?$/.test(basicPlay) && !/(CS([2-3]|H)|POCS([2-3]|H))(\([1-9]*E*[1-9]*(\/TH)?\))?(\(UR\))?$/.test(basicPlay))) groundBallOut(gameState, basicPlay, modifiers, runnerResults, 2); // eg., 64(1)3/GDP/G6 (ground into double play)
   else if (modifiers.check(/^LDP$/) || (modifiers.check(/^BPDP$/)) || (modifiers.check(/^FDP$/))) flyBallOut(gameState, basicPlay, modifiers, runnerResults); // eg. 8(B)84(2)/LDP/L8 (lined into double play)
   else if (modifiers.check(/^LTP$/)) flyBallOut(gameState, basicPlay, modifiers, runnerResults); // eg. 1(B)16(2)63(1)/LTP/L1 (lined into triple play)
   else if (modifiers.check(/^GTP$/) || (modifiers.check(/^TP$/))) groundBallOut(gameState, basicPlay, modifiers, runnerResults); // eg., 6(2)4(1)3/GTP/G6 (ground into triple play)
   else if (/^C$/.test(basicPlay)) fieldingError(gameState, basicPlay, modifiers, runnerResults, 1); // eg., C/E2 (interference)
-  else if (/^S[0-9]*\+?$/.test(basicPlay)) hit(gameState, basicPlay, modifiers, runnerResults, 1); // eg., S5 (single)
-  else if (/^D[0-9]*$/.test(basicPlay)) hit(gameState, basicPlay, modifiers, runnerResults, 2);// eg., D9 (double)
-  else if (/^T[0-9]*$/.test(basicPlay)) hit(gameState, basicPlay, modifiers, runnerResults, 3); // eg., T8 (triple)
   else if (/^DGR[0-9]*$/.test(basicPlay)) hit(gameState, basicPlay, modifiers, runnerResults, 2); // eg., DGR/L9LS.2-H (ground rule double)
   else if (/^[1-9]*E[1-9]*$/.test(basicPlay)) fieldingError(gameState, basicPlay, modifiers, runnerResults, 1); // eg., E1/TH/BG15.1-3 (fielding error)
   else if (/^FC[1-9]?$/.test(basicPlay)) groundBallOut(gameState, basicPlay, modifiers, runnerResults, 1, 1); // eg., FC5/G5.3XH(52) (fielder's choice)
@@ -76,7 +76,7 @@ const explicitOuts = (playInfo) => {
   return runnersOut;
 };
 
-const errorOnPlay = (playInfo) => /\([1-9]*E[1-9]*(\/TH)?\)/.test(playInfo);
+const errorOnPlay = (playInfo) => /\([1-9]*E[1-9]*(\/(TH|FO))?\)/.test(playInfo);
 
 const getNumberOfStrikes = (pitches) => {
   let strikes = 0;
@@ -114,7 +114,7 @@ const advanceRunners = (gameState, explicitOuts, implicitBatterPosition, runnerR
   const rawEvents = withoutDupes.map(event => {
     let earned = true;
     if (/\(UR\)/.test(event)) earned = false;
-    const errorNegatingOut = /([1-3]|B)X([1-3]|H)(\((NR|UR)\))*\([1-9]*E[1-9]*\)/.test(event);
+    const errorNegatingOut = /([1-3]|B)X([1-3]|H)(\((NR|UR)\))*\([1-9]*E[1-9]*(\/FO)*\)/.test(event);
     const runner = event[0] === 'B' ? 0 : Number(event[0]);
     const out = event[1] === 'X' && !errorNegatingOut;
     const finalBase = event[2] === 'H' ? 4 : Number(event[2]);
