@@ -11,7 +11,8 @@ const processPlay = (gameState, basicPlay, modifiers, runnerResults) => {
   if (/^[1-9](\(([1-9]|B)*\))?$/.test(basicPlay) && !modifiers.check(/^FO$/) && !modifiers.check(/^B*G(\+|-)?$/)) flyBallOut(gameState, basicPlay, modifiers, runnerResults); // eg. 8/F78 (fly ball out)
   else if (/^[1-9]$/.test(basicPlay) && modifiers.check(/^B*G(\+|-)?$/)) groundBallOut(gameState, basicPlay, modifiers, runnerResults); // eg. 3/G (ground ball out)
   else if (/^[1-9]\(([1-3]|H)\)$/.test(basicPlay) && !modifiers.check(/^DP$/) && (modifiers.check(/^G(\+|-)?$/) || modifiers.check(/^FO$/))) groundBallOut(gameState, basicPlay, modifiers, runnerResults); // eg., 6(1) (force out)
-  else if (/^[1-9][1-9]+(\([1-3]\)|\(B\))?$/.test(basicPlay) && !modifiers.check(/^DP$/)) groundBallOut(gameState, basicPlay, modifiers, runnerResults); // eg. 63/G  (ground ball out)
+  else if (/^[1-9][1-9]+(\([1-3]\)|\(B\))?$/.test(basicPlay) && !modifiers.check(/^F$/) && !modifiers.check(/^DP$/)) groundBallOut(gameState, basicPlay, modifiers, runnerResults); // eg. 63/G  (ground ball out)
+  else if (/^[1-9][1-9]+(\([1-3]\)|\(B\))?$/.test(basicPlay) && modifiers.check(/^F$/) && !modifiers.check(/^DP$/)) flyBallOut(gameState, basicPlay, modifiers, runnerResults, 1); // eg. 84(1)/F/FO  (flyball ball out where ball is dropped and someone is forced out)
   else if (/^S[0-9]*\+?$/.test(basicPlay)) hit(gameState, basicPlay, modifiers, runnerResults, 1); // eg., S5 (single)
   else if (/^D[0-9]*$/.test(basicPlay)) hit(gameState, basicPlay, modifiers, runnerResults, 2);// eg., D9 (double)
   else if (/^T[0-9]*$/.test(basicPlay)) hit(gameState, basicPlay, modifiers, runnerResults, 3); // eg., T8 (triple)
@@ -214,11 +215,12 @@ const fieldingError = (gameState, playInfo, modifiers, runnerResults, implicitBa
   advanceRunners(gameState, [], implicitBatterPosition, runnerResults);
 };
 
-const flyBallOut = (gameState, playInfo, modifiers, runnerResults) => {
+const flyBallOut = (gameState, playInfo, modifiers, runnerResults, implicitBatterPosition) => {
+  implicitBatterPosition = implicitBatterPosition || 0;
   log.play(`Fly ball out: ${playInfo}|${modifiers.mods}|${runnerResults}`);
   eventBus.trigger('flyBallOut', gameState, { playInfo, modifiers, runnerResults });
   const explicitRunnersOut = explicitOuts(playInfo);
-  advanceRunners(gameState, explicitRunnersOut, 0, runnerResults);
+  advanceRunners(gameState, explicitRunnersOut, implicitBatterPosition, runnerResults);
 };
 
 const groundBallOut = (gameState, playInfo, modifiers, runnerResults, totalOuts, implicitBatterPosition) => {
