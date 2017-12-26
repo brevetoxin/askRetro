@@ -11,8 +11,8 @@ const processPlay = (gameState, basicPlay, modifiers, runnerResults) => {
   if (/^[1-9](\(([1-9]|B)*\))?$/.test(basicPlay) && !modifiers.check(/^FO$/) && !modifiers.check(/^B*G(\+|-)?$/)) flyBallOut(gameState, basicPlay, modifiers, runnerResults); // eg. 8/F78 (fly ball out)
   else if (/^[1-9]$/.test(basicPlay) && modifiers.check(/^B*G(\+|-)?$/)) groundBallOut(gameState, basicPlay, modifiers, runnerResults); // eg. 3/G (ground ball out)
   else if (/^[1-9]\(([1-3]|H)\)$/.test(basicPlay) && !modifiers.check(/^DP$/) && (modifiers.check(/^G(\+|-)?$/) || modifiers.check(/^FO$/))) groundBallOut(gameState, basicPlay, modifiers, runnerResults); // eg., 6(1) (force out)
-  else if (/^[1-9][1-9]+(\([1-3]\)|\(B\))?$/.test(basicPlay) && !modifiers.check(/^F$/) && !modifiers.check(/^DP$/)) groundBallOut(gameState, basicPlay, modifiers, runnerResults); // eg. 63/G  (ground ball out)
-  else if (/^[1-9][1-9]+(\([1-3]\)|\(B\))?$/.test(basicPlay) && modifiers.check(/^F$/) && !modifiers.check(/^DP$/)) flyBallOut(gameState, basicPlay, modifiers, runnerResults, 1); // eg. 84(1)/F/FO  (flyball ball out where ball is dropped and someone is forced out)
+  else if (/^[1-9][1-9]+(\([1-3]\)|\(B\))?$/.test(basicPlay) && !modifiers.check(/^SF$/) && !modifiers.check(/^(F|P)$/) && !modifiers.check(/^DP$/)) groundBallOut(gameState, basicPlay, modifiers, runnerResults); // eg. 63/G  (ground ball out)
+  else if (/^[1-9][1-9]+(\([1-3]\)|\(B\))?$/.test(basicPlay) && modifiers.check(/^(F|L|P)$/) && !modifiers.check(/^DP$/)) flyBallOut(gameState, basicPlay, modifiers, runnerResults, 1); // eg. 84(1)/F/FO  (flyball ball out where ball is dropped and someone is forced out)
   else if (/^K([1-9]*)?(\+.*)?$/.test(basicPlay)) strikeout(gameState, basicPlay, modifiers, runnerResults); // eg., K (strikeout)
   else if (/^SB([2-3]|H(\(T?UR\))?)(;SB([2-3]|H(\(UR\))?))*$/.test(basicPlay)) stolenBase(gameState, basicPlay, modifiers, runnerResults); // eg., SB2 (stolen base);
   else if (/^S[0-9]*\+?$/.test(basicPlay)) hit(gameState, basicPlay, modifiers, runnerResults, 1); // eg., S5 (single)
