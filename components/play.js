@@ -232,10 +232,12 @@ const groundBallOut = (gameState, playInfo, modifiers, runnerResults, totalOuts,
   const explicitRunnersOut = explicitOuts(playInfo);
   const runnerEvents = getRunnerEvents(runnerResults);
   let runnersOut = 0;
+  let outAtFirst = false;
   runnerEvents.forEach(event => {
     if (event[1] === 'X') runnersOut++;
+    if (event[2] === '1') outAtFirst = true;
   });
-  if ((explicitRunnersOut.length + runnersOut) >= totalOuts) implicitBatterPosition = 1;
+  if ((explicitRunnersOut.length + runnersOut) >= totalOuts && !outAtFirst) implicitBatterPosition = 1;
   advanceRunners(gameState, explicitRunnersOut, implicitBatterPosition, runnerResults);
 };
 
