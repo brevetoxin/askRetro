@@ -2,6 +2,7 @@
 
 const log = require('./logger');
 const eventBus = require('./eventBus');
+const Modifiers = require('./modifiers');
 
 const processPlay = (gameState, basicPlay, modifiers, runnerResults) => {
   gameState.baseRunners[0] = gameState.currentBatter;
@@ -50,6 +51,39 @@ const byRunner = (a, b) => {
   return 0;
 };
 
+const isRBIEligible = (state, runner) => {
+  const currentPlay = state.presentPlay.playInfo;
+  const rawEvent = currentPlay.split('.')[0];
+  const runnerResults = currentPlay.split('.')[1];
+  let relevantRunnerResult;
+  if (runnerResults) {
+    const runnerResultsArr = runnerResults.split(';');
+    relevantRunnerResult = runnerResultsArr.find(result => {
+      const currentRunner = result[0] === 'B' ? 0 : Number(result[0]);
+      return currentRunner === runner;
+    });
+  }
+  const rawEvent2 = rawEvent.split(/\/(?![^(]*\))/);
+  const event = rawEvent2[0];
+  const modifiers = new Modifiers(rawEvent2.slice(1));
+  if (/^(PB|WP)/.test(event)) return false;
+  if (/^W/.test(event) && runner < 3) return false;
+  if (/^SB([2-3]|H(\(T?UR\))?)(;SB([2-3]|H(\(UR\))?))*$/.test(event)) return false;
+  if (/^(CS([2-3]|H)|POCS([2-3]|H))(\([1-9]*E*[1-9]*(\/TH)?\))?(\(UR\))?$/.test(event)) return false;
+  if (/^(PO)[1-3](\(.*\))?$/.test(event)) return false;
+  if (/\(NR\)/.test(relevantRunnerResult)) return false;
+  if (/^[1-9]*E[1-9]*$/.test(event) && state.outs > 1) return false;
+  if (/^[1-9]*E[1-9]*$/.test(event) && runner < 3) return false;
+  if (/^[1-9]*E[1-9]*$/.test(event) && (modifiers.check('SH') || modifiers.check('(G|L|F)')) && runner < 3) return false;
+  if (/\([1-9]*E[1-9]*(\/THH*[1-9]*)*\)/.test(relevantRunnerResult)) return false;
+  if (/^BK$/.test(event)) return false;
+  if (modifiers.check(/^GDP$/)) return false;
+  if (/SBH/.test(event)) return false;
+  if (/^K([1-9]*)?(\+.*)?$/.test(event)) return false;
+  if (/^OA$/.test(event)) return false;
+  return true;
+};
+
 const getRunnerEvents = (runnerResults) => runnerResults ? runnerResults.split(';') : [];
 
 const runnerResultsAreExplicit = (runnerResults, runner) => {
@@ -66,6 +100,7 @@ const recordOut = (gameState, runner, outAt) => {
 const runScored = (gameState, runner, earned) => {
   eventBus.trigger('run', gameState, { runner, earned });
   gameState.score[gameState.battingTeam]++;
+  if (isRBIEligible(gameState, runner)) eventBus.trigger('rbi', gameState);
 };
 
 const explicitOuts = (playInfo) => {
