@@ -100,6 +100,7 @@ class Game {
   }
 
   end () {
+    eventBus.trigger('endGame', this.state);
     log.game(`Finalizing ${this.state.id}`);
   }
 };
