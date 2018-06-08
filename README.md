@@ -1,11 +1,29 @@
 # askRetro
 Experimental, customizable event driven retrosheet event file processor for developing applications that analyze historical major league baseball data.
 
+Askretro traverses each event file line by line and maintains the state of the game as each event (play, substitution, etc) occurs. It also emits events to which users can subscribe using callbacks that process the current game state and event information.
+
 ## Installation
 
 ```
 npm install askRetro
 ```
+
+## Game state
+AskRetro maintains the game state at all times. The state object contains the following fields:
+
+Field | Description
+----- | -----------
+id | The retrosheet id of the game (eg, ANA201704070)
+previousPlay | The play information from the previous line of the file
+presentPlay | The play information from the line currently being processed
+baseRunners | The baserunner object (see below)
+lineups | The lineup object (see below)
+inning | The current inning
+outs | The current number of outs
+currentBatter | The retrosheet id of the current batter (eg., maybc001)
+score | The score object (see below)
+battingTeam | The team currently batting
 
 ## Examples
 ### Walk through all games from 2017 and console log all homeruns
