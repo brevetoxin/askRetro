@@ -25,6 +25,16 @@ currentBatter | The retrosheet id of the current batter (eg., maybc001)
 score | The score object (see below)
 battingTeam | The team currently batting
 
+#### baseRunners
+
+Field | Description | Default
+----- | ----------- | -------
+0 | the batter | N/A
+1 | runner on first | null
+2 | runner on | null
+3 | runner on third | null
+
+
 ## Examples
 ### Walk through all games from 2017 and console log all homeruns
 ```javascript
