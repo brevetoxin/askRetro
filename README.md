@@ -154,6 +154,36 @@ Field | Description | Default
   battingTeam:0
 ```
 
+## Available events
+newGame: triggered when a new game id is detected in the file, just before the game state is reset
+newInning: triggered at the end of an inning just before the inning is reset in the game state
+lineupChange: triggered once for each starter at the beginning of the game and again each time there is a substitution during the game.
+processInfo: triggered when the processor encounters an 'info' line in the file
+processStart: triggered when the processor encounters a 'start' line in the file
+processPlay: triggered when the processor encounters a 'play' line in the file
+processSub: triggered when the processor encounters a 'sub' line in the file
+end: triggered at the end of the game
+out: triggered whenever an out occurs
+run: triggered whenever a run is scored
+rbi: triggered whenever an rbi is credited to the hitter
+advanceRunners: triggered just before runners advance on any given play
+balk: triggered when the pitcher is charged with a balk
+caughtStealing: triggered when a runner is caught stealing
+defensiveIndifference: triggered when a runner is awarded a base due to defensive indifference
+hit: triggered when the batter gets a hit (single, double, triple, home run)
+hitByPitch: triggered when the batter is hit by a pitch
+error: triggered when a fielding error occurs
+flyBallOut: triggered when the batter hits into a fly ball out
+groundBallOut: triggered when the batter hits into a ground ball out
+otherAction: triggered when something strange happens
+pickoff: triggered when a runner is picked off a base
+stolenBase: triggered when a runner steals a base
+strikeout: triggered when a batter strikes out
+walk: triggered when a batter walks
+wildPitch: triggered when a pitcher is charged with a wild pitch
+beforeFileLoad: triggered just before a new file is loaded
+afterFileLoad: triggered after a file loads
+
 
 ## Examples
 ### Walk through all games from 2017 and console log all homeruns
